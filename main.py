@@ -392,7 +392,7 @@ def main() -> None:
             host_address = get_local_ip()
             messagebox.showinfo(
                 "LAN blackjack hosted",
-                f"Your local network address is {host_address}:47920.\n"
+                f"Your local network address is {host_address}:{server.port}.\n"
                 "Share this address with players on the same Wi-Fi. "
                 "The host must keep the game open.",
                 parent=root,
@@ -402,7 +402,8 @@ def main() -> None:
             address = _ask_text(
                 root,
                 "Join a LAN table",
-                "Enter the host's local network address:",
+                "Enter the host's IP address or computer name. You can paste "
+                "the full address, including :47920:",
                 "127.0.0.1",
             )
             if address is None:
@@ -412,7 +413,7 @@ def main() -> None:
             if name is None:
                 root.destroy()
                 return
-            client = LanClient(address.strip(), name)
+            client = LanClient(address, name)
         _clear_window(root)
         root.resizable(True, True)
         LanBlackjackApp(root, client, server, host_address)
@@ -423,9 +424,24 @@ def main() -> None:
         if server is not None:
             server.stop()
         try:
-            messagebox.showerror("Blackjack could not start", str(error), parent=root)
+            messagebox.showerror(
+                "Blackjack could not start",
+                _connection_error_message(error),
+                parent=root,
+            )
         finally:
             root.destroy()
+
+
+def _connection_error_message(error: Exception) -> str:
+    if isinstance(error, OSError):
+        return (
+            f"Could not connect to the game host.\n\n{error}\n\n"
+            "Check that both computers are on the same Wi-Fi/LAN, the host "
+            "game is still open, and Windows Firewall allows Blackjack "
+            "(TCP port 47920). Enter the host address with or without :47920."
+        )
+    return str(error)
 
 
 def _choose_mode(root: tk.Tk) -> str | None:

@@ -2,7 +2,7 @@ import queue
 import time
 import unittest
 
-from lan_network import LanClient, LanServer
+from lan_network import LanClient, LanServer, parse_server_address
 
 
 def wait_for_state(client: LanClient, predicate) -> dict:
@@ -20,6 +20,20 @@ def wait_for_state(client: LanClient, predicate) -> dict:
 
 
 class LanNetworkTests(unittest.TestCase):
+    def test_server_address_accepts_host_with_and_without_port(self) -> None:
+        self.assertEqual(parse_server_address("192.168.1.12"), ("192.168.1.12", 47920))
+        self.assertEqual(
+            parse_server_address("192.168.1.12:47920"),
+            ("192.168.1.12", 47920),
+        )
+        self.assertEqual(parse_server_address("localhost:5000"), ("localhost", 5000))
+        self.assertEqual(parse_server_address("[::1]:47920"), ("::1", 47920))
+
+    def test_server_address_reports_invalid_input_clearly(self) -> None:
+        for address in ("", "192.168.1.12:abc", "[::1", "localhost:70000"):
+            with self.subTest(address=address), self.assertRaises(ValueError):
+                parse_server_address(address)
+
     def test_host_and_client_share_a_server_authoritative_table(self) -> None:
         server = LanServer(port=0)
         host = None
@@ -27,7 +41,7 @@ class LanNetworkTests(unittest.TestCase):
         try:
             server.start()
             host = LanClient("127.0.0.1", "Host", server.port)
-            guest = LanClient("127.0.0.1", "Guest", server.port)
+            guest = LanClient(f"127.0.0.1:{server.port}", "Guest")
             wait_for_state(host, lambda state: len(state["players"]) == 2)
             wait_for_state(guest, lambda state: len(state["players"]) == 2)
 

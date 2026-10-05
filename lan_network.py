@@ -16,6 +16,40 @@ PORT = 47920
 MAX_MESSAGE_BYTES = 8192
 
 
+def parse_server_address(address: str, default_port: int = PORT) -> tuple[str, int]:
+    """Accept a hostname/IP with an optional port, including bracketed IPv6."""
+    value = address.strip()
+    if not value:
+        raise ValueError("Enter the host's IP address or computer name.")
+
+    if value.startswith("["):
+        closing_bracket = value.find("]")
+        if closing_bracket < 0:
+            raise ValueError("For IPv6, enter the address in [address]:port format.")
+        host = value[1:closing_bracket]
+        suffix = value[closing_bracket + 1 :]
+        if suffix and not suffix.startswith(":"):
+            raise ValueError("Enter the address as host or host:port.")
+        port_text = suffix[1:] if suffix else ""
+    elif value.count(":") == 1:
+        host, _, port_text = value.rpartition(":")
+        if not port_text.isdigit():
+            raise ValueError("Enter the address as host or host:port.")
+    else:
+        host = value
+        port_text = ""
+
+    if not host or any(character.isspace() for character in host):
+        raise ValueError("Enter a valid host IP address or computer name.")
+    if port_text:
+        selected_port = int(port_text)
+        if not 1 <= selected_port <= 65535:
+            raise ValueError("The port must be between 1 and 65535.")
+    else:
+        selected_port = default_port
+    return host, selected_port
+
+
 class LanServer:
     def __init__(self, port: int = PORT) -> None:
         self.port = port
@@ -192,6 +226,7 @@ class LanClient:
         clean_name = " ".join(name.split())
         if not clean_name or len(clean_name) > 24:
             raise ValueError("Player names must contain 1 to 24 characters.")
+        host, port = parse_server_address(host, port)
         self.updates: queue.Queue[dict[str, Any]] = queue.Queue()
         self._socket = socket.create_connection((host, port), timeout=5)
         self._socket.settimeout(None)

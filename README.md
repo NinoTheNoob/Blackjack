@@ -12,9 +12,11 @@ Install Python 3.10 or newer, then choose Solo, Host LAN Game, or Join LAN Game:
 py main.py
 ```
 
-To join a LAN game, enter the host's displayed local network address. Both
-computers must be on the same network, and the host may need to allow Blackjack
-through the Windows firewall.
+To join a LAN game, enter the host's displayed address (for example,
+`192.168.1.12:47920`); the game accepts it with or without the `:47920` port.
+Both computers must be on the same Wi-Fi/LAN, the host must keep the game
+running, and the host may need to allow Blackjack through the Windows firewall
+(TCP port 47920).
 The game opens as a normal desktop window (not a tray app); close its window to
 exit.
 
