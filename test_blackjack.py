@@ -95,6 +95,24 @@ class GameTests(unittest.TestCase):
         self.assertEqual(game.dealer_total, 18)
         self.assertEqual(game.results, ["DEALER WINS"])
 
+    def test_player_wins_when_dealer_busts(self) -> None:
+        game = BlackjackGame(rng=random.Random(1))
+        set_draw_order(
+            game,
+            [
+                Card("10", "♠"), Card("8", "♥"), Card("6", "♣"),
+                Card("10", "♦"), Card("10", "♠"),
+            ],
+        )
+        game.start_round(20)
+        game.stand()
+
+        self.assertEqual(game.dealer_total, 26)
+        self.assertEqual(game.results, ["YOU WIN"])
+        self.assertEqual(game.bankroll, 1020)
+        self.assertEqual(game.wins, 1)
+        self.assertEqual(game.losses, 0)
+
     def test_dealer_stands_on_soft_seventeen(self) -> None:
         game = BlackjackGame(rng=random.Random(7))
         set_draw_order(

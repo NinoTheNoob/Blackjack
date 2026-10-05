@@ -69,6 +69,25 @@ class LanGameTests(unittest.TestCase):
         self.assertEqual(table.snapshot("a")["players"][0]["hands"][0]["result"], "DEALER WINS")
         self.assertEqual(table.snapshot("b")["players"][1]["hands"][0]["result"], "DEALER WINS")
 
+    def test_dealer_bust_pays_active_players_but_not_busted_players(self) -> None:
+        table = self.make_table(
+            [
+                Card("10", "♠"), Card("10", "♥"), Card("10", "♣"),
+                Card("6", "♦"), Card("8", "♠"), Card("6", "♥"),
+                Card("10", "♦"), Card("10", "♣"),
+            ]
+        )
+        table.place_bet("b", 20)
+        table.act("a", "stand")
+        table.act("b", "hit")
+
+        snapshot = table.snapshot("a")
+        self.assertEqual(snapshot["dealer_total"], 26)
+        self.assertEqual(snapshot["players"][0]["hands"][0]["result"], "YOU WIN")
+        self.assertEqual(snapshot["players"][1]["hands"][0]["result"], "BUST")
+        self.assertEqual(snapshot["players"][0]["bankroll"], 1020)
+        self.assertEqual(snapshot["players"][1]["bankroll"], 980)
+
     def test_ready_requires_two_connected_players(self) -> None:
         table = BlackjackTable(random.Random(3))
         table.add_player("a", "Alice")

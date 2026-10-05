@@ -322,9 +322,12 @@ class BlackjackTable:
                     else:
                         player.bankroll += hand.bet * 5 // 2
                         outcomes.append("BLACKJACK!")
+                elif dealer_total > 21:
+                    player.bankroll += hand.bet * 2
+                    outcomes.append("YOU WIN")
                 elif dealer_blackjack or dealer_total > hand.total:
                     outcomes.append("DEALER WINS")
-                elif dealer_total < hand.total or dealer_total > 21:
+                elif dealer_total < hand.total:
                     player.bankroll += hand.bet * 2
                     outcomes.append("YOU WIN")
                 else:

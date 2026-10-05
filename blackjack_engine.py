@@ -252,10 +252,14 @@ class BlackjackGame:
                     outcomes.append("BLACKJACK!")
                     self.wins += 1
                     self.blackjacks += 1
+            elif dealer_total > 21:
+                self.bankroll += hand.bet * 2
+                outcomes.append("YOU WIN")
+                self.wins += 1
             elif dealer_blackjack or dealer_total > hand.total:
                 outcomes.append("DEALER WINS")
                 self.losses += 1
-            elif dealer_total < hand.total or dealer_total > 21:
+            elif dealer_total < hand.total:
                 self.bankroll += hand.bet * 2
                 outcomes.append("YOU WIN")
                 self.wins += 1
