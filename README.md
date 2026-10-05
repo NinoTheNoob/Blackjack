@@ -60,3 +60,13 @@ download PyInstaller.
 ```text
 py -m unittest -v
 ```
+
+## Support the game
+
+Enjoying Blackjack? You can support its development with a coffee:
+
+<p align="center">
+  <a href="https://ko-fi.com/nin0">
+    <img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi" width="200">
+  </a>
+</p>
